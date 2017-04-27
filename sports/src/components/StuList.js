@@ -1,260 +1,159 @@
 import React from 'react';
-import { Card,Table,Button,Select,Input } from 'antd';
-import classNames from 'classnames';
-import $ from 'jquery';
-const InputGroup = Input.Group;
+import { Button,Card,Input,Select,Form,Col,Row,Table } from 'antd';
+const FormItem = Form.Item;
 const Option = Select.Option;
+import { Link } from 'react-router';
+import $ from 'jquery';
 
-const GoodsList = React.createClass({
-  getInitialState() {
-    return {
-      loading: false,
-      searchGame:"",
-      searchName:"",
-      focus:false,
-      gamelist:[],
-      datalist:[],
-      total:"0",
-      page:"1"
-    };
-  },
-  ajaxData(page){
-    let _this = this;
+
+class StuList extends React.Component {
+  state = {
+    loading: false,
+    list: [],
+    total: 0,
+    page: 1,
+    focus: false,      //以下关于搜索
+    search: ""
+  };
+
+  ajaxData = (page)=>{
+    //3333333333333333333
+    const _this = this;
+    let arr = [];
+    for(let i=1;i<32;i++){arr.push({id:i,name:'小明'+i,stuid:'130200310'+i,school:'青岛二中',class:'一年一班',sex:'男',age:18, key: i})}
+    //3333333333333333333
     this.setState({
       loading:true
     });
-    $.ajax({
-      url:"http://iwan.addev.com/goods/goodShows",
-      type:"get",
-      data:{
-        page:page||"1",
-        pageSize:15,
-        GPlatformType:this.props.location.query.GPlatformType || "2",
-        gameid:this.state.searchGame,
-        goodsname:this.state.searchName
-      },
-      success:function(response,status){
-        var res = JSON.parse(response);
-        _this.setState({
-          datalist:res.data.list,
-          total:res.data.count,
-          loading:false
-        })
-      }
-    })
-  },
-  componentDidMount(){
-    this.ajaxData(1);
-  },
-  componentDidUpdate(props,state){
-    if(props.location.query.GPlatformType!==this.props.location.query.GPlatformType){
-      this.ajaxData(1);
-      this.setState({
-        page:1
+    setTimeout(function(){
+      _this.setState({
+        list:arr,
+        loading:false
       })
-    }
-  },
-  pageChange(e){
+    },1000)
+  }
+
+  componentDidMount = ()=>{
+    this.ajaxData(1);
+  }
+
+  pageChange = (e)=>{
     this.ajaxData(e.current);
     this.setState({
-      page:e.current
+      page: e.current
     })
-  },
-  handleInputChange(e) {
+  }
+
+  handleInputChange = (e)=>{
     this.setState({
-      searchName: e.target.value,
+      search: e.target.value,
     });
-  },
-  handleFocusBlur(e) {
+  }
+
+  handleFocusBlur = (e)=>{
     this.setState({
       focus: e.target === document.activeElement,
     });
-  },
-  handleSearch() {
+  }
+
+  handleSearch = ()=>{
     this.ajaxData();
-  },
-  selectChange(value){
-    this.setState({
-      searchGame:value
-    })
-  },
-  onSearch(v){
-    //搜索游戏
-    $.ajax({
-      url: 'http://iwan.addev.com/agame/sGameNew?keyword='+v,
-      jsonp: 'jsonp',
-      dataType: 'jsonp',
-      success: function (res, status) {
-        if(res.data){
-          var arr = [];
-          for(var p in res.data){
-            arr.push(res.data[p])
-          }
-          this.setState({
-            gamelist:arr
-          })
-        }
-      }.bind(this)
-    });
-  },
-  onSelect(value){
-    this.setState({
-      searchGame:value
-    });
-  },
-  toH1(record,e){
-    window.location.href = "http://iwan.addev.com/goods/searchlog?s="+record.Fid;
-  },
-  toH2(record,e){
-    window.location.href = "http://iwan.addev.com/goods/log?id="+record.Fid;
-  },
-  ediGoods(record,e){
-    let loc = window.location;
-    window.location.href = loc.origin + loc.pathname + "#addgoods?Fid=" +record.Fid
-  },
-  render(){
+  }
+
+  render = ()=>{
 //Table表头
-    let _this = this;
     const columns = [{
-      title: '物品编号',
-      dataIndex: 'Fid',
-      key: 'Fid',
+      title: '学号',
+      dataIndex: 'stuid',
+      key: 'stuid',
     },{
-      title: '物品名称',
-      dataIndex: 'GName',
-      key: 'GName',
+      title: '姓名',
+      dataIndex: 'name',
+      key: 'name',
     },{
-      title: '物品分类',
-      render: function(text,record){
-        switch(record.GPlatformType){
-          case "1": return "页游";
-          case "2": return "手游";
-          case "3": return "端游";
-          default : return "";
-        }
-      }
+      title: '学校',
+      dataIndex:'school',
+      key:'school'
     },{
-      title:'发放形式',
-      render:function(text,record){
-        switch (record.GSort){
-          case "7": return "ams形式";
-          case "1": return "cdkey形式";
-          case "5": return "mp(营销平台)";
-          case "3": return "实物奖励";
-          case "6": return "预留QQ";
-          default: return "";
-        }
-      }
+      title:'班级',
+      dataIndex:'class',
+      key:'class'
     },{
-      title:'类别',
-      render:function(text,record){
-        switch (record.GType){
-          case "1": return "游戏道具";
-          case "5": return "每日礼包";
-          case "6": return "抽奖物品";
-          case "7": return "白名单";
-          case "8": return "7日礼包";
-          case "9": return "道具售卖";
-          case "10": return "体育";
-          case "11": return "奥运";
-          default : return "";
-        }
-      }
+      title:'性别',
+      dataIndex:'sex',
+      key:'sex'
     },{
-      title:'游戏',
-      dataIndex: 'FGameName',
-      key: 'FGameName',
-    },{
-      title:'发放/总数',
-      render:function(text,record){
-        return record.GSTotal+"/"+record.GTotal;
-      }
-    },{
-      title:'状态',
-      render:function(text,record){
-        switch (record.status){
-          case "0": return "暂停";
-          case "1": return "正常";
-          case "2": return "测试";
-          default : return "";
-        }
-      }
-    },{
-      title:'上传时间',
-      dataIndex: 'ctime',
-      key: 'ctime',
-    },{
-      title:'到期时间',
-      dataIndex: 'GEnd',
-      key: 'GEnd',
-    },{
-      title:'录入人',
-      render:function(text,record){
-        return record.GExt.createUser;
-      }
+      title:'年龄',
+      dataIndex: 'age',
+      key: 'age',
     },{
       title:'操作',
+      key:'ctr',
       render(text,record){
-        return <Button type='primary' size='small' onClick={_this.ediGoods.bind(this,record)}>编辑</Button>
-      }
-    },{
-      title:'查看',
-      render(text,record){
-        return <div><Button type='primary' size='small'><a onClick={_this.toH1.bind(this,record)}>查看</a></Button> <Button type='primary' size='small'><a onClick={_this.toH2.bind(this,record)}>日发放</a></Button></div>
+        return <Link to={{pathname:'/OneStu',query:{id:record.id}}} key={record.id}><Button size='small' type="ghost">查看运动数据</Button></Link>
       }
     }];
 
-    //根据不同GPlatformType配置不同信息
-    const btnCls = classNames({
-      'ant-search-btn': true,
-      'ant-search-btn-noempty': !!this.state.searchName.trim(),
-    });
-    const searchCls = classNames({
-      'ant-search-input': true,
-      'ant-search-input-focus': this.state.focus,
-    });
-
-    const GPlatformType = {
-      1 : '页游',
-      2 : '手游',
-      3 : '端游'
+    const { getFieldDecorator,getFieldValue } = this.props.form;
+    const formItemLayout = {
+      labelCol: { span: 8 },
+      wrapperCol: { span: 16 },
     };
-    const i = this.props.location.query.GPlatformType;
     return(
-      <Card title={ i?GPlatformType[i]+'管理':'手游管理' }>
-        <div style={{float:'right',marginBottom:14}}>
-          <Select showSearch
-                  style={{ width: 250 }}
-                  placeholder="搜索游戏"
-                  optionFilterProp="children"
-                  notFoundContent="没有相关数据"
-                  onSearch={this.onSearch}
-                  onSelect={this.onSelect}
-                  filterOption={false}
-            >
-            <Option value="">全部游戏</Option>
-            {
-              this.state.gamelist && this.state.gamelist.map((item,index)=>{
-                return <Option value={item.FId}><span className="suggestID">[{item.FId}] </span> {item.FGameName}</Option>
-              })
-            }
-          </Select>
-          <div className="ant-search-input-wrapper" style={{width:250,marginLeft:20}}>
-            <InputGroup className={searchCls}>
-              <Input placeholder="请输入物品名称" value={this.state.searchName} onChange={this.handleInputChange}
-                     onFocus={this.handleFocusBlur} onBlur={this.handleFocusBlur} onPressEnter={this.handleSearch}
-                />
-              <div className="ant-input-group-wrap">
-                <Button icon="search" className={btnCls} onClick={this.handleSearch} />
-              </div>
-            </InputGroup>
-          </div>
-        </div>
-        <div className="clearfix"></div>
-        <Table loading={this.state.loading} onChange={this.pageChange} className="add-css" columns={columns} dataSource={this.state.datalist} pagination={{current:this.state.page,pageSize:15,total:parseInt(this.state.total)}} bordered></Table>
-      </Card>
+      <div style={{padding:10}}>
+        <Card title="搜索条件" extra={<Button type="primary" onClick={()=>{this.setState({hideSearch:!this.state.hideSearch})}}>{this.state.hideSearch?"显示条件":"隐藏条件"}</Button>}>
+          <Form
+            style={{display:this.state.hideSearch?"none":"block"}}
+            className="ant-advanced-search-form"
+            onSubmit={this.handleSearch}
+          >
+            <Row gutter={40}>
+              <Col span={8}>
+                <FormItem {...formItemLayout} label="学号/姓名">
+                  {getFieldDecorator(`sInput`)(
+                    <Input placeholder="输入学号或姓名搜索"/>
+                  )}
+                </FormItem>
+              </Col>
+              <Col span={8}>
+                <FormItem {...formItemLayout} label="选择班级">
+                  {getFieldDecorator(`sClass`)(
+                    <Select placeholder="请选择班级" allowClear={true}>
+                      <Option value="1001">一年一班</Option>
+                      <Option value="1002">一年二班</Option>
+                    </Select>
+                  )}
+                </FormItem>
+              </Col>
+              <Col span={8}>
+                <FormItem {...formItemLayout} label="性别筛选">
+                  {getFieldDecorator(`sGender`,{
+                    initialValue:"3"
+                  })(
+                    <Select>
+                      <Option value="3">全部</Option>
+                      <Option value="1">男</Option>
+                      <Option value="2">女</Option>
+                    </Select>
+                  )}
+                </FormItem>
+              </Col>
+            </Row>
+            <Row>
+              <Col className="btns" span={24} style={{ textAlign: 'center' }}>
+                <Button onClick={()=>{this.props.form.resetFields()}} size="large">清除条件</Button>
+                <Button type="primary" size="large" onClick={this.handleSearch} loading={this.state.loading}>搜索</Button>
+              </Col>
+            </Row>
+          </Form>
+        </Card>
+        <div style={{width:"100%",height:"12px"}}></div>
+        <Table loading={this.state.loading} onChange={this.pageChange} className="add-css" columns={columns} dataSource={this.state.list} pagination={{current:parseInt(this.state.page),pageSize:10,total:parseInt(this.state.total)}} bordered />
+      </div>
     )
   }
-})
 
-export default GoodsList;
+}
+
+const StuListForm = Form.create()(StuList);
+export default StuListForm;
