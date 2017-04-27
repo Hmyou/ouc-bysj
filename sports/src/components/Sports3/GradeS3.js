@@ -123,7 +123,7 @@ class GradeS3Form extends React.Component{
       title: null
     });
     chart.col('value', {
-      alias: '班级平均个数'
+      alias: '班级人均个数'
     });
     chart.render();
   });
@@ -224,6 +224,7 @@ class GradeS3Form extends React.Component{
           <Spin />
         </div>}
         {!this.state.searchloading && this.state.searchType=="1" && <div>
+          <span style={{position:'absolute',top:70,left:20}}>数据为单天内各班级人均次数</span>
           <this.Pie
             data={this.state.pieData}
             width={500}

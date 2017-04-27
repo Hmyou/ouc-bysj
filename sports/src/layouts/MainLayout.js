@@ -16,8 +16,12 @@ class LMenu extends React.Component{
             <Menu.Item key="1"><Link to={{pathname:'/StuList'}}>学生列表</Link></Menu.Item>
           </SubMenu>
           <SubMenu key="sub2" title={<span><Icon type="appstore" /><span>群体数据</span></span>}>
-            <Menu.Item key="5"><Link to={{pathname:'/sports3'}}>仰卧起坐</Link></Menu.Item>
-            <Menu.Item key="6"><Link to={{pathname:'/sports4'}}>折返跑</Link></Menu.Item>
+            <Menu.Item key="2"><Link to={{pathname:'/sports1'}}>折返跑</Link></Menu.Item>
+            <Menu.Item key="3"><Link to={{pathname:'/sports2'}}>纵跳摸高</Link></Menu.Item>
+            <Menu.Item key="4"><Link to={{pathname:'/sports3'}}>仰卧起坐</Link></Menu.Item>
+            <Menu.Item key="5"><Link to={{pathname:'/sports4'}}>换物跑</Link></Menu.Item>
+            <Menu.Item key="6"><Link to={{pathname:'/sports5'}}>运球比赛</Link></Menu.Item>
+            <Menu.Item key="7"><Link to={{pathname:'/sports6'}}>基础训练</Link></Menu.Item>
           </SubMenu>
         </Menu>
       </div>

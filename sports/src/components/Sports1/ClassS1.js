@@ -9,7 +9,7 @@ const Option = Select.Option;
 import createG2 from 'g2-react';
 import G2, { Stat,Plugin,Frame } from 'g2';
 
-class ClassS3Form extends React.Component{
+class ClassS1Form extends React.Component{
   state = {
     pieData: [],
     lineData: [],
@@ -218,7 +218,7 @@ class ClassS3Form extends React.Component{
           <Spin />
         </div>}
         {!this.state.searchloading && this.state.searchType=="1" && <div>
-          <span style={{position:'absolute',top:70,left:20}}>数据为所做次数人数分布图</span>
+          <span style={{position:'absolute',top:70,left:20}}>数据为所做强度人数分布图</span>
           <this.Pie
             data={this.state.pieData}
             width={500}
@@ -241,5 +241,5 @@ class ClassS3Form extends React.Component{
   }
 }
 
-const ClassS3 = Form.create()(ClassS3Form);
-export default ClassS3;
+const ClassS1 = Form.create()(ClassS1Form);
+export default ClassS1;

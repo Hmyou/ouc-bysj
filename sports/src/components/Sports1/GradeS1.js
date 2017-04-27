@@ -9,7 +9,7 @@ const Option = Select.Option;
 import createG2 from 'g2-react';
 import G2, { Stat,Plugin,Frame } from 'g2';
 
-class ClassS3Form extends React.Component{
+class GradeS1Form extends React.Component{
   state = {
     pieData: [],
     lineData: [],
@@ -40,7 +40,7 @@ class ClassS3Form extends React.Component{
         }
 
         let data = [];
-        for(let i=1;i<=31;i++){
+        for(let i=1;i<31;i++){
           data.push({
             id:i,
             stuid:'130200310'+i,
@@ -49,27 +49,35 @@ class ClassS3Form extends React.Component{
             time: '2017-03-'+i
           })
         }
-        for(let i=1;i<=30;i++){
-          data.push({
-            id:i,
-            stuid:'130200310'+i,
-            total_time: 30+30*Math.random()-30*Math.random(),
-            num: parseInt(i+100*Math.random()-10*Math.random()),
-            time: '2017-04-'+i
-          })
-        }
 
         setTimeout(()=>{
           this.setState({
             pieData: [
-              {name: '0-10个', value: 1 },
-              {name: '11-30个', value: 10},
-              {name: '31-70个', value: 12},
-              {name: '71-100个',  value: 14},
-              {name: '101-150个', value: 3},
-              {name: '151个以上', value: 1}
+              {class: '一年一班', value: 18 },
+              {class: '一年二班', value: 28},
+              {class: '一年三班', value: 30},
+              {class: '一年四班',  value: 32},
+              {class: '一年五班',  value: 12},
+              {class: '一年六班',  value: 32},
+              {class: '一年七班',  value: 22},
+              {class: '一年八班',  value: 32},
             ],
-            lineData: data,
+            lineData: [
+              {class:'一年一班',date:'2017-04-18',value:30},
+              {class:'一年一班',date:'2017-04-19',value:35},
+              {class:'一年一班',date:'2017-04-20',value:36},
+              {class:'一年一班',date:'2017-04-21',value:31},
+              {class:'一年一班',date:'2017-04-22',value:22},
+              {class:'一年一班',date:'2017-04-23',value:26},
+              {class:'一年一班',date:'2017-04-24',value:33},
+              {class:'一年二班',date:'2017-04-18',value:20},
+              {class:'一年二班',date:'2017-04-19',value:45},
+              {class:'一年二班',date:'2017-04-20',value:26},
+              {class:'一年二班',date:'2017-04-21',value:41},
+              {class:'一年二班',date:'2017-04-22',value:12},
+              {class:'一年二班',date:'2017-04-23',value:32},
+              {class:'一年二班',date:'2017-04-24',value:23},
+            ],
             searchloading:false
           })
         },1000)
@@ -79,48 +87,44 @@ class ClassS3Form extends React.Component{
 
   //饼图配置
   Pie = createG2(chart => {
-    chart.coord('theta', {
-      radius: 0.8 // 设置饼图的大小
+    chart.coord('polar', {
+      startAngle: Math.PI, // 起始角度
+      endAngle: Math.PI * (3 / 2) // 结束角度
     });
-    chart.legend('name', {
-      position: 'bottom'
+    chart.axis('value', {
+      labels: null
     });
-    chart.tooltip({
-      title: null,
-      map: {
-        value: 'value'
+    chart.axis('class', {
+      gridAlign: 'middle',
+      labels: {
+        label: {
+          textAlign: 'right' // 设置坐标轴 label 的文本对齐方向
+        }
       }
     });
-    chart.intervalStack()
-      .position(Stat.summary.percent('value'))
-      .color('name')
-      .label('name*..percent',function(name, percent){
-        percent = (percent * 100).toFixed(2) + '%';
-        return name + ' ' + percent;
+    chart.legend('class', {
+      position: 'bottom',
+      itemWrap: true // 图例需要换行
+    });
+    chart.interval().position('class*value')
+      .color('class','rgb(252,143,72)-rgb(255,215,135)')
+      .label('value',{offset: -15,label: {textAlign: 'center', fill: '#000'}})
+      .style({
+        lineWidth: 1,
+        stroke: '#fff'
       });
     chart.render();
-    // 设置默认选中
-    let geom = chart.getGeoms()[0]; // 获取所有的图形
-    let items = geom.getData(); // 获取图形对应的数据
-    geom.setSelected(items[1]); // 设置选中
   });
 
-  //双Y轴趋势图配置
+  //折线图配置
   Line = createG2(chart => {
-    let Frame = G2.Frame;
-    let frame = new Frame(this.state.lineData);
-    chart.source(frame, {
-      'num': {alias: '人均次数（个）', min: 0},
-      'total_time': {alias: '人均训练总时间（分钟）', min: 0}
-    });
-    // 去除 X 轴标题
-    chart.axis('time', {
+    chart.line().position('date*value').color('class').size(2);
+    chart.axis('date', {
       title: null
     });
-    chart.legend(false);// 不显示图例
-    chart.intervalStack().position('time*num').color('num', ['#348cd1']); // 绘制层叠柱状图
-    chart.line().position('time*total_time').color('#5ed470').size(2).shape('smooth'); // 绘制曲线图
-    chart.point().position('time*total_time').color('#5ed470'); // 绘制点图
+    chart.col('value', {
+      alias: '班级人均强度'
+    });
     chart.render();
   });
 
@@ -141,10 +145,10 @@ class ClassS3Form extends React.Component{
             <Col span={8}>
               <FormItem {...formItemLayout} label="搜索方式">
                 {getFieldDecorator(`sType`,{initialValue:"1"})(
-                <RadioGroup size="large">
-                  <RadioButton value="1" key="sType1">单天搜索</RadioButton>
-                  <RadioButton value="2" key="sType2">范围搜索</RadioButton>
-                </RadioGroup>
+                  <RadioGroup size="large">
+                    <RadioButton value="1" key="sType1">单天搜索</RadioButton>
+                    <RadioButton value="2" key="sType2">范围搜索</RadioButton>
+                  </RadioGroup>
                 )}
               </FormItem>
             </Col>
@@ -177,15 +181,17 @@ class ClassS3Form extends React.Component{
               </Col>
             }
             <Col span={8}>
-              <FormItem {...formItemLayout} label="选择班级">
-                {getFieldDecorator(`sClass`,{
+              <FormItem {...formItemLayout} label="选择年级">
+                {getFieldDecorator(`sGrade`,{
                   rules: [
-                    { required: true, message: '请选择班级进行搜索' },
+                    { required: true, message: '请选择年级进行搜索' },
                   ],
                 })(
-                  <Select placeholder="请选择班级" allowClear={true}>
-                    <Option value="1001">一年一班</Option>
-                    <Option value="1002">一年二班</Option>
+                  <Select placeholder="请选择年级" allowClear={true}>
+                    <Option value="101">一年级</Option>
+                    <Option value="102">二年级</Option>
+                    <Option value="103">三年级</Option>
+                    <Option value="104">四年级</Option>
                   </Select>
                 )}
               </FormItem>
@@ -218,7 +224,7 @@ class ClassS3Form extends React.Component{
           <Spin />
         </div>}
         {!this.state.searchloading && this.state.searchType=="1" && <div>
-          <span style={{position:'absolute',top:70,left:20}}>数据为所做次数人数分布图</span>
+          <span style={{position:'absolute',top:70,left:20}}>数据为单天内各班级人均强度</span>
           <this.Pie
             data={this.state.pieData}
             width={500}
@@ -241,5 +247,5 @@ class ClassS3Form extends React.Component{
   }
 }
 
-const ClassS3 = Form.create()(ClassS3Form);
-export default ClassS3;
+const GradeS1 = Form.create()(GradeS1Form);
+export default GradeS1;
